@@ -1,0 +1,27 @@
+//1. Реализовать методы массива 
+
+function map (arr, fn) {
+  for (var i = 0; i < arr.length; i++){
+    arr[i] = fn(arr[i]);
+  }
+  return arr;
+}
+
+map([1,2,3,4,5], function (elem) {
+   return elem * 2;
+}); // [2,4,6,8,10]
+
+//2. filter
+function filter (arr, fn) {
+  let resList = [];
+  for (var i = 0; i < arr.length; i++){
+    if(fn(arr[i])){
+      resList.push(arr[i]);
+    }
+  }
+  return resList;
+}
+
+filter([1,2,3,4,6], function (elem) {
+    return elem % 2;
+}); // [1,3]
