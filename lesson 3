@@ -1,0 +1,402 @@
+// Задание №1 Входные данные
+//Написать 2 класса:
+//  + Client
+//  + Card
+//  
+//класс Client имеет 5 входных параметра
+//  + firstName
+//  + lastName
+//  + address
+//  + phone
+//  + id
+//  
+// у экземпляра класса, есть следующие методы
+//  + getFirstName/updateFirstName - получить/обновить firstName
+//  + getLastName/updateLastName - получить/обновить lastName
+//  + getFullName - получить/обновить полное имя 
+//  + getAddress/updateFirstName - получить address
+//  + getPhone/updateFirstName - получить телефон
+//  + update(data) - обновляет все поля, которые переданные в объекте дата (все существующие, но не добавляет лишних)
+//  + destroy - удаляет клиента из массива входных данных
+//  + getCards - возвращает массив экземпляров класса, которые принадлежат этому клиенту
+//  + addCart - добавляет карту клиенту в массив cards и возвращает ее (экземпляр класса Cart)
+//  
+//  А так же доступны слудующие статические методы
+//  + fetch() - возвращает все клиентов (массив экземлпяров класса Client)
+//  + find(id) - вовращает клиента по id (экземлпяр класса Client)
+//  + destroy(id) - удаляет клиента по id (из массива clients)
+//  + create(data) - создает клиента (а так же добавляет его в массив clients, в виде обычного объекта, по типу тех,  которые уже находятся в массиве) и возвращает его (как экземпляр класса client) 
+//  
+//У класса Card есть следующих 5 параметров
+//  + number
+//  + expirationData
+//  + cliendId
+//  + id
+//  
+//  у экземпляра класса, есть следующие методы
+//  + getNumber - получить number
+//  + getClient - возвращает клиента по clientId (экземпляр класса Client)
+//  + getExpidationData/updateExpirationData - получить/обновить полное expirationData 
+//  
+//  А так же доступны слудующие статические методы
+//  + fetch() - возвращает все карты (массив экземлпяров класса Cart)
+//  + find(id) - вовращает карту по id (экземлпяр класса Cart)
+//  + destroy(id) - удаляет карту по id (из массива carts)
+//  + findByClient(clientId) - возвращает карту по clientId (экземпляр класса Client)
+
+class Client {
+
+  constructor(objData) {
+
+    let hasArg = {
+      id: true,
+      firstName: true,
+      lastName: true,
+      address: true,
+      phone: true,
+    };
+
+    for (var key in hasArg) {
+      if (key in objData) {
+        this[key] = objData[key];
+      } else {
+        throw new Error(`Missing input parameter - ${key}, to create Client`);
+      }
+    }
+
+    this.fullName = `${objData.firstName} ${objData.lastName}`;
+  }
+
+  //Статические
+  static fetch() {
+    let resListClients = [];
+
+    for (var i = 0; i < clients.length; i++) {
+      try {
+        resListClients.push(new Client(clients[i]));
+      } catch (err) {
+        resListClients.push(`Error create ${err.message}`);
+      }
+    }
+
+    return resListClients;
+  }
+
+  static find(id) {
+    let res = false;
+
+    for (var i = 0; i < clients.length; i++) {
+      if(clients[i].id === id){
+        res = new Client(clients[i]);
+      }
+    }
+
+    return res;
+  }
+
+  static destroy(id) {
+    for (var i = 0; i < clients.length; i++) {
+      if (clients[i].id === id) {
+        clients.splice(i, 1);
+        i = 0;
+      }
+    }
+  }
+
+  static create(data) {
+    let client = new Client(data);
+    clients.push(data);
+    return client
+  }
+
+  //Геттеры
+  getFirstName() {
+    return this.firstName;
+  }
+
+  getLastName() {
+    return this.lastName;
+  }
+
+  getFullName() {
+    return this.fullName;
+  }
+
+  getAddress() {
+    return this.address;
+  }
+
+  getPhone() {
+    return this.phone;
+  }
+
+  //Сетеры
+  updateFirstName(firstName) {
+    this.firstName = firstName;
+  }
+
+  updateLastName(lastName) {
+    this.lastName = lastName;
+  }
+
+  updateFullName(fullName) {
+    this.fullName = fullName;
+  }
+
+  updateAddress(address) {
+    this.address = address;
+  }
+
+  updatePhone(phone) {
+    this.phone = phone;
+  }
+  
+  update(data) {
+    for (var key in data) {
+      
+      if (key in this) {
+        this[key] = data[key];
+      }
+
+    }
+  }
+
+  //Другое
+  destroy(arr) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].id === this.id) {
+        arr.splice(i, 1);
+      }
+      i = 0;
+    }
+
+    return arr;
+  }
+
+  addCart(objCard) {
+    try {
+      let card = new Card(objCard);
+      cards.push(objCard);
+      return card;
+    } catch (err){
+      throw new Error(`error creating card object - ${objCard.id}`);
+    } 
+  }
+
+  getCards() {
+    let resCards = [];
+
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].clientId === this.id) {
+        resCards.push(new Card(cards[i]));
+      }
+    }
+
+    return resCards;
+  }
+
+}
+
+class Card {
+
+  constructor(objData){
+    let hasArg = {
+      number: true,
+      expirationData: true,
+      clientId: true,
+      id: true
+    };
+
+    for (var key in hasArg) {
+      if (key in objData) {
+        this[key] = objData[key];
+      } else {
+        throw new Error(`Missing input parameter - ${key}, to create Card`);
+      }
+    }
+  }
+
+  //Статические
+  static fetch() {
+    let resListCards = [];
+
+    for (var i = 0; i < cards.length; i++) {
+      try {
+        resListCards.push(new Card(cards[i]));
+      } catch (err) {
+        resListCards.push(`Error create ${err.message}`);
+      }
+    }
+
+    return resListCards;
+  }
+
+  static find(id) {
+    let res = false;
+    for (var i = 0; i < cards.length; i++) {
+      if(cards[i].id === id){
+        res = new Card(cards[i]);
+      }
+    }
+    return res;
+  }
+
+  static destroy(id) {
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].id === id) {
+        cards.splice(i, 1);
+        i = 0;
+      }
+    }
+  }
+
+  static findByClient(clientId) {
+    let resListCards = [];
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].clientId == clientId) {
+        resListCards.push(new Card(cards[i]));
+      }
+    }
+    return resListCards;
+  }
+
+  //Гетеры
+  getNumber() {
+    return this.number;
+  }
+
+  getClient() {
+    return Client.find(this.clientId);
+  }
+
+  getExpidationData() {
+    return this.expirationData;
+  }
+
+  //Сетеры
+  updateExpirationData(expirationData) {
+    this.expirationData = expirationData;
+  }
+
+}
+
+var clients = [
+  {
+    id: 0,
+    firstName: 'FirstName1',
+    lastName: 'LastName1',
+    address: 'address1',
+    phone: 'phone1'
+  }, {
+    id: 1,
+    firstName: 'FirstName2',
+    lastName: 'LastName2',
+    address: 'address2',
+    phone: 'phone2'
+  }, {
+    id: 2,
+    firstName: 'FirstName3',
+    lastName: 'LastName3',
+    address: 'address3',
+    phone: 'phone3'
+  }
+];
+
+var cards = [
+  {
+    id: 0,
+    clientId: 0,
+    number: '0000',
+    expirationData: 1493034361601
+  }, {
+    id: 1,
+    clientId: 0,
+    number: '0001',
+    expirationData: 1493034301601
+  }, {
+    id: 2,
+    clientId: 0,
+    number: '0002',
+    expirationData: 1493034001601
+  }, {
+    id: 3,
+    clientId: 1,
+    number: '1001',
+    expirationData: 1493034101601
+  }
+];
+  
+//Примеры работы
+
+Client.fetch(); // возвращает всех клиентов в виде экземпляров класса client
+// [ new Client(clients[0]), new Client(clients[1]), ...]
+var client = Client.find(0);
+client.getFirstName(); // FirstName1
+client.getCards(); // возвращается массив экземпляров класса Cart которые относятся к этому клиенту
+// [ new Cart(...) ]
+
+
+
+//=====================================================================================================
+// Задание №2
+//Реализовать трёхуровневое наследование с произвольными иерархиями 
+
+class User{
+
+  constructor(name, patronymic) {
+    this.role = "user";
+    this.name = name;
+    this.patronymic = patronymic;
+  }
+
+  getName() {
+    return this.name;
+  }
+
+  getPatronymic() {
+    return this.patronymic;
+  }
+
+  setName(name) {
+    this.name = name
+  }
+
+  setPatronymic(patronymic) {
+    this.patronymic = patronymic
+  }
+
+  login(ldap, password){
+    return "Successful login";
+  }
+
+  logout(ldap, password){
+    return "Successful logout";
+  }
+}
+
+class Moderator extends User {
+  constructor(name, patronymic, role){
+    super(name, patronymic);
+    this.role = role;
+  }
+
+  getSomeText(){
+    return this.someText;
+  }
+
+  setSomeText(someText) {
+    this.someText = someText;
+  }
+}
+
+class Admin extends Moderator {
+  someData = "someData";
+
+  getAllData() {
+    return this.someData;
+  }
+
+  setAllData(data) {
+    this.someData = data;
+  }
+}
