@@ -1,0 +1,96 @@
+// реализовать класс Clock который принимает два параметра 
+// cигнатура создания может быть такой
+// Каждую секунду показывает время в указанном формате (иметь формат по умолчанию)
+// Для запуска таймера использовать setInterval 
+// Предусмотреть возможность остановки таймера
+class Clock {
+
+	constructor(newDate, format = 'hh/mm') {//Конструктор
+		this.newDate = newDate; //Дата
+		this.intervalTime = 1000; //Интервал задержки
+		this.changeFormatTo(format); // Установка формата времени
+		this.speedTime = 1; // Скорость часов
+	}
+
+	changeFormatTo(newformat) { // Установка формата времени
+		let needData = { // Объект с нужными фукциями даты
+			yyyy: {fun: 'getFullYear', separator: '-', len: -4},
+			yy: {fun: 'getFullYear', separator: '-', len: -2},
+			MM: {fun: 'getMonth', separator: '-', len: -2},
+			dd: {fun: 'getDate', separator: ' ', len: -2},
+			hh: {fun: 'getHours', separator: ':', len: -2},
+			mm: {fun: 'getMinutes', separator: ':', len: -2},
+			ss: {fun: 'getSeconds', separator: '', len: -2}
+		};
+
+		this.listFormat = newformat.split("/").map(arg => needData[arg]); // Создаем массив функций даты в последовательности от юзера
+	}
+
+	run() { // запуск
+		this.intervalId = setInterval(() => {
+			this.newDate.setSeconds(this.newDate.getSeconds() + this.speedTime); // увеличение даты
+
+			console.log(this.listFormat.map((arg, index, arr) => {
+				let resDate = '';
+
+				if (arg.fun === 'getMonth') { // Проверка на месяц так как отчет с 0-ля
+					resDate = ('0' + (this.newDate.getMonth() + 1)).slice(arg.len); // Формируем чать даты времени
+				} else {
+					resDate = ('0' + this.newDate[arg.fun]()).slice(arg.len); // Формируем чать даты времени
+				}
+
+				if (index < arr.length - 1) { // Логика добавления разделителя
+					resDate += arg.separator;
+				}
+
+				return resDate;
+			}).join(''));
+		},
+		this.intervalTime); // запуск интервала
+	}
+
+	stopTime() { // Остановка времени
+		if (this.intervalId) {
+			clearInterval(this.intervalId);
+		}
+	}
+
+	updateIntervalTimeOnline(newInterval) { // Обновление интервала задержки в Онлайн режиме
+		this.stopTime();
+		this.intervalTime = newInterval;
+		this.run();
+	}
+
+	updateIntervalTimeOffline(newInterval) { // Обновление интервала задержки в Офф-лайн режиме
+		this.intervalTime = newInterval;
+	}
+
+	updateSpeedTime(newSpeed){ // Задаем скорость времени
+		this.speedTime = newSpeed;
+	}
+
+	synchronizationTime() { // Делаем синхронизацию времени с реальным временем
+		this.newDate = new Date();
+	}
+
+}
+
+let clock = new Clock(new Date, 'hh/mm/ss'); // Создания Объекта времени
+
+clock.run(); // Запуск Времени
+
+clock.changeFormatTo('hh/mm'); // Смена формата времени
+
+clock.changeFormatTo('yyyy/MM/dd'); // Смена формата времени
+
+clock.changeFormatTo('yyyy/MM/dd/hh/mm/ss'); // Смена формата времени
+
+clock.stopTime(); // Остановка времени
+
+clock.updateIntervalTimeOffline(2000); // Обновление интервала задержки в Онлайн режиме
+
+clock.updateIntervalTimeOnline(2000); // Обновление интервала задержки в Офф-лайн режиме
+
+clock.updateSpeedTime(2); // Задаем скорость времени
+
+clock.synchronizationTime(); // Делаем синхронизацию времени с реальным временем
