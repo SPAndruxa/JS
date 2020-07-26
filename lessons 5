@@ -1,0 +1,56 @@
+function fetch(url, initObj={method:"GET"}) {
+  return new Promise(function(resolve, reject) {
+    let xhr = new XMLHttpRequest(); //Создаем объект запроса
+
+    xhr.open(initObj.method, url, true); // Записываем Метод / УРЛ / флаг асинхрона
+
+    if (initObj.headers) { // Проверяем наличие переданных Хедерсов
+      for (var key in initObj.headers) {
+        xhr.setRequestHeader(key, initObj.headers[key]);
+      }
+    }
+
+    xhr.responseType = 'json'; // Записываем формат JSON
+
+    xhr.onload = function() { // Слушатель ответа
+      if (xhr.status !== 200) {
+        reject(`Error ${xhr.status}: ${xhr.statusText}`);
+      } else {
+        resolve({
+          response: xhr.response,
+          nameServlet: url.split('/')[url.split('/').length - 1].split('?')[0]
+        });
+      }
+    }
+
+    xhr.onerror = function() { // Слушатель ошибки вызова
+        reject(`Error ${xhr.status}: ${xhr.statusText}`)
+    }
+
+    xhr.send(initObj.body || null); // Вызываем
+  });
+}
+
+function success (successRes) { // Обработчик успешного вызова
+  console.log(successRes.map(arg => {
+    return {
+      title: `my ${arg.nameServlet}`,
+      [`${arg.nameServlet}`]: arg.response
+    };
+  }));
+}
+
+function errs (errorRes) { // Обработчик ошибок
+  console.log(errorRes);
+}
+
+let listURL = [ // Массив нужных вызовов где: url - УРЛ запроса, body - объект настроек
+  {
+    url: "https://jsonplaceholder.typicode.com/albums"
+  },
+  {
+    url: "https://jsonplaceholder.typicode.com/photos"
+  }
+];
+
+Promise.all(listURL.map(objURL => fetch(objURL.url, objURL.body || undefined))).then(success, errs);
